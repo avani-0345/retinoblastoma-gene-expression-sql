@@ -1,0 +1,9 @@
+pandas
+numpy
+scipy
+matplotlib
+seaborn
+adjustText
+plotly
+gseapy
+rdata

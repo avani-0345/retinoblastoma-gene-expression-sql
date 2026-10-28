@@ -109,7 +109,7 @@ The other scripts are included for transparency. They were run in a different en
 The Python analysis scripts and SQL queries were generated with AI assistance (Claude, Anthropic). The project owner framed the question, supplied the DESeq2 results table, reviewed the outputs, checked them against known retinoblastoma biology and wrote the interpretation. The differential expression statistics (DESeq2) were produced before this repository. Please re-run and verify the code before reusing it.
 
 ## Data and tools
-- Input: DESeq2 results table for retinoblastoma (`data/`). Source and sharing permission: **add the dataset source here before making the repository public.**
+-   : DESeq2 results table for retinoblastoma (GSE125903_Differential_Expression_Genes_DESeq2.csv.gz, 57,773 genes). Source and sharing permission: **.**
 - Tools: Python (pandas, SciPy, matplotlib, seaborn, Plotly, gseapy), SQLite, MSigDB v7.5.1 (Liberzon et al.).
 
 ## License

@@ -2,7 +2,7 @@
 
 ![Volcano plot](figures/volcano_plot.png)
 
-Exploration of a DESeq2 differential expression table from retinoblastoma, a childhood eye cancer caused by loss of the *RB1* gene. The analysis asks whether the data show the expected biology: **proliferation programmes up, retinal (photoreceptor) identity down**. They do.
+Exploration of a DESeq2 differential expression table from public dataset GEO **GSE125903**, which compares retinoblastoma tumours with adult retina. Retinoblastoma is a childhood eye cancer caused by loss of the *RB1* gene. The analysis asks whether the data show the expected biology: **proliferation programmes up, retinal (photoreceptor) identity down**. They do.
 
 **Contents:** [Key results](#key-results) · [Figures](#figures) · [SQL](#sql) · [Repository structure](#repository-structure) · [Reproducing](#reproducing) · [Limitations](#limitations) · [How this was made](#how-this-was-made)
 
@@ -32,6 +32,9 @@ Exploration of a DESeq2 differential expression table from retinoblastoma, a chi
 | [`pathway_gene_heatmap.png`](figures/pathway_gene_heatmap.png) | log2FC of the strongest genes in key pathways |
 | [`MA_plot.png`](figures/MA_plot.png) | Mean expression versus fold change |
 | [`top_genes_and_qc.png`](figures/top_genes_and_qc.png) | Top genes, p-value histogram, gene counts |
+| [`pca_samples.png`](figures/pca_samples.png) | PCA of the 7 samples in the GEO raw counts file (74.6% of variance on PC1) |
+| [`heatmap_key_genes.png`](figures/heatmap_key_genes.png) | log2 CPM of proliferation, RB1/MYCN and photoreceptor genes per sample |
+| [`heatmap_top_DE_genes_samples.png`](figures/heatmap_top_DE_genes_samples.png) | Top 20 up and top 20 down DE genes across the 7 samples (row z-score) |
 
 **Interactive volcano plot:** [`docs/volcano_interactive.html`](docs/volcano_interactive.html). GitHub shows HTML files as code, so to view it, turn on GitHub Pages (Settings → Pages → Branch `main`, folder `/docs`) and open `https://<your-username>.github.io/<repo-name>/volcano_interactive.html`.
 
@@ -93,23 +96,24 @@ LIMIT 5;
 ## Reproducing
 ```bash
 pip install -r requirements.txt
-python scripts/reproduce_volcano.py     # re-creates the volcano plot from the input table
+python scripts/reproduce_volcano.py              # re-creates the volcano plot from the input table
+python scripts/pca_and_sample_heatmaps.py        # PCA and sample heatmaps from the GEO raw counts
 ```
 The other scripts are included for transparency. They were run in a different environment, and the enrichment scripts need the MSigDB gene-set tables, which are not redistributed here. See [`scripts/README.md`](scripts/README.md).
 
 ## Limitations
-- **Cell composition:** the photoreceptor drop may partly reflect normal retina being rich in photoreceptors, not only tumour-intrinsic changes.
-- **Contrast direction** is not stored in the input file. Positive log2FC is assumed to mean higher in retinoblastoma.
+- **Tissue composition (main caveat):** the comparison group is adult retina, which is rich in photoreceptors, while the tumour is a proliferating mass. The drop in photoreceptor and phototransduction genes therefore largely reflects tissue composition and should not be read as tumour cells actively switching those genes off.
+- **Contrast direction** is not stored in the input table. Positive log2FC is taken to mean higher in tumour, which is consistent with *RB1* down and *MYCN* up. Confirm against the original GEO file.
 - **Annotation:** 11% of tested genes had no symbol and were left out of enrichment.
 - **Noisy fold changes:** log2FC for low-count genes is noisy (median lfcSE about 0.6). Applying `lfcShrink` would help before ranking by effect size.
-- **No sample-level plots (PCA, sample heatmap):** the count matrix was not available. `scripts/pca_heatmap_template.py` is ready for one.
+- **Sample labels:** the GEO raw counts file (`data/GSE125903_raw_counts_GRCh38_p13_NCBI.tsv.gz`) has 7 samples and no tumour/retina labels, while the GEO series has 10. Two samples (GSM3584494, GSM3584495) show a retina-like, photoreceptor-high and low-proliferation profile and separate from the other five on PC1, so the sample figures group samples by expression pattern, not by official labels. Check the sample list on the GEO page. Counts for the remaining three samples were not in this file, and the DESeq2 table may have used all 10, so the sample plots do not reproduce the DESeq2 contrast exactly.
 - This is a **re-analysis that recovers known biology**, not a new discovery.
 
 ## How this was made
 The Python analysis scripts and SQL queries were generated with AI assistance (Claude, Anthropic). The project owner framed the question, supplied the DESeq2 results table, reviewed the outputs, checked them against known retinoblastoma biology and wrote the interpretation. The differential expression statistics (DESeq2) were produced before this repository. Please re-run and verify the code before reusing it.
 
 ## Data and tools
--   : DESeq2 results table for retinoblastoma (GSE125903_Differential_Expression_Genes_DESeq2.csv.gz, 57,773 genes). Source and sharing permission: **.**
+- Input: DESeq2 results table derived from public dataset **GEO [GSE125903](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE125903)** (retinoblastoma tumours vs adult retina; Illumina HiSeq 2500). Original study: Rajasekaran S, Nagarajha Selvan LD, Dotts K, Kumar R, et al. Non-coding and coding transcriptional profiles are significantly altered in pediatric retinoblastoma tumors. *Front Oncol* 2019;9:221 (PMID 31058073). The data belong to the original authors and are shared here with citation for educational and portfolio purposes.
 - Tools: Python (pandas, SciPy, matplotlib, seaborn, Plotly, gseapy), SQLite, MSigDB v7.5.1 (Liberzon et al.).
 
 ## License

@@ -7,3 +7,4 @@ adjustText
 plotly
 gseapy
 rdata
+scikit-learn

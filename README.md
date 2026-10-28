@@ -32,9 +32,9 @@ Exploration of a DESeq2 differential expression table from public dataset GEO **
 | [`pathway_gene_heatmap.png`](figures/pathway_gene_heatmap.png) | log2FC of the strongest genes in key pathways |
 | [`MA_plot.png`](figures/MA_plot.png) | Mean expression versus fold change |
 | [`top_genes_and_qc.png`](figures/top_genes_and_qc.png) | Top genes, p-value histogram, gene counts |
-| [`pca_samples.png`](figures/pca_samples.png) | PCA of the 7 samples in the GEO raw counts file (74.6% of variance on PC1) |
-| [`heatmap_key_genes.png`](figures/heatmap_key_genes.png) | log2 CPM of proliferation, RB1/MYCN and photoreceptor genes per sample |
-| [`heatmap_top_DE_genes_samples.png`](figures/heatmap_top_DE_genes_samples.png) | Top 20 up and top 20 down DE genes across the 7 samples (row z-score) |
+| [`pca_samples.png`](figures/pca_samples.png) | PCA of the 7 samples in the GEO raw counts file: tumours and retina separate on PC1 (74.6% of variance) |
+| [`heatmap_key_genes.png`](figures/heatmap_key_genes.png) | log2 CPM of proliferation, RB1/MYCN and photoreceptor genes in each sample |
+| [`heatmap_top_DE_genes_samples.png`](figures/heatmap_top_DE_genes_samples.png) | Top 20 up and top 20 down DE genes across the 7 samples (row z-score), split by tumour vs retina |
 
 **Interactive volcano plot:** [`docs/volcano_interactive.html`](docs/volcano_interactive.html). GitHub shows HTML files as code, so to view it, turn on GitHub Pages (Settings → Pages → Branch `main`, folder `/docs`) and open `https://<your-username>.github.io/<repo-name>/volcano_interactive.html`.
 
@@ -102,11 +102,11 @@ python scripts/pca_and_sample_heatmaps.py        # PCA and sample heatmaps from 
 The other scripts are included for transparency. They were run in a different environment, and the enrichment scripts need the MSigDB gene-set tables, which are not redistributed here. See [`scripts/README.md`](scripts/README.md).
 
 ## Limitations
-- **Tissue composition (main caveat):** the comparison group is adult retina, which is rich in photoreceptors, while the tumour is a proliferating mass. The drop in photoreceptor and phototransduction genes therefore largely reflects tissue composition and should not be read as tumour cells actively switching those genes off.
-- **Contrast direction** is not stored in the input table. Positive log2FC is taken to mean higher in tumour, which is consistent with *RB1* down and *MYCN* up. Confirm against the original GEO file.
+- **Tissue composition (main caveat):** the comparison group is adult retina, which is rich in photoreceptors. The two retina samples show very high photoreceptor genes (for example *RHO*, *SAG*, *GNAT1*) and very low proliferation genes, so the drop in photoreceptor and phototransduction genes largely reflects tissue composition and developmental stage, not only tumour-intrinsic repression.
+- **Contrast direction:** the input table does not state it, but log2FC in the table correlates with the tumour-minus-retina difference computed from the counts (Spearman rho = 0.87, 15,341 genes), so positive log2FC means higher in tumour.
 - **Annotation:** 11% of tested genes had no symbol and were left out of enrichment.
 - **Noisy fold changes:** log2FC for low-count genes is noisy (median lfcSE about 0.6). Applying `lfcShrink` would help before ranking by effect size.
-- **Sample labels:** the GEO raw counts file (`data/GSE125903_raw_counts_GRCh38_p13_NCBI.tsv.gz`) has 7 samples and no tumour/retina labels, while the GEO series has 10. Two samples (GSM3584494, GSM3584495) show a retina-like, photoreceptor-high and low-proliferation profile and separate from the other five on PC1, so the sample figures group samples by expression pattern, not by official labels. Check the sample list on the GEO page. Counts for the remaining three samples were not in this file, and the DESeq2 table may have used all 10, so the sample plots do not reproduce the DESeq2 contrast exactly.
+- **Sample size and coverage:** the GEO raw counts file (`data/GSE125903_raw_counts_GRCh38_p13_NCBI.tsv.gz`) has 7 of the 10 series samples: 5 retinoblastoma tumours and 2 adult retina (GSM3584494, GSM3584495, labelled from the GEO sample list). The group sizes are small, and the DESeq2 table may have used all 10 samples, so the sample plots illustrate the contrast rather than reproduce the DESeq2 test.
 - This is a **re-analysis that recovers known biology**, not a new discovery.
 
 ## How this was made

@@ -7,7 +7,7 @@
 | `make_figures.py` | Volcano with symbols, MA plot, enrichment summary, interactive Plotly volcano | No. Paths point to the original environment |
 | `make_extra_figures.py` | Enrichment heatmap, dot plots, GSEA curves, pathway gene heatmap, QC panels | No. Same reason |
 | `build_database.py` | Builds `data/retinoblastoma.db` from the results tables | No. Same reason |
-| `pca_and_sample_heatmaps.py` | PCA and sample heatmaps from the GEO raw counts (`data/GSE125903_raw_counts...`) | **Yes** (tested; needs scikit-learn and seaborn) |
+| `pca_and_sample_heatmaps.py` | PCA, sample heatmaps and a consistency check against the DESeq2 table, from the GEO raw counts | **Yes** (tested; needs scikit-learn and seaborn) |
 | `pca_heatmap_template.py` | Generic PCA and heatmap template for any count matrix | Template, tested on dummy data only |
 
 The non-reproducible scripts were run in a temporary environment where the MSigDB v7.5.1 gene-set tables (Hallmark, KEGG, Reactome, GO BP) were loaded from local files. To redo the enrichment yourself, get the same gene sets from the R package `msigdbr` or from `gseapy`, then edit the file paths at the top of each script.
